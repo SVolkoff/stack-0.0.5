@@ -102,7 +102,7 @@ template<typename T>
 void stack<T>::print() const
 {
 	std::lock_guard<std::mutex> lock(mutex_);
-	if (isempty()) std::cout << "Stack is empty" << std::endl;
+	if (count_ == 0) std::cout << "Stack is empty" << std::endl;
 	else
 		for (int i = 0; i < count_; i++)
 			std::cout << array_[i] << ' ';
@@ -120,7 +120,7 @@ template <typename T>
 auto stack<T>::pop() -> std::shared_ptr<T>
 {
 	std::lock_guard<std::mutex> lock(mutex_);
-	if (isempty())
+	if (count_ == 0)
 	{
 		throw ("Stack is empty!");
 	}
@@ -136,7 +136,7 @@ void stack<T>::push(T const & value)
 	if (array_size_ == count_)
 	{
 		size_t ar_size;
-		if (isempty())
+		if (count_ == 0)
 			ar_size = 1;
 		else
 			ar_size = array_size_ * 2;
