@@ -144,6 +144,9 @@ void stack<T>::push(T const & value)
 		{
 			T *ptr = new T[ar_size];
 			std::copy(array_, array_ + count_, ptr);
+			delete[] array_;
+			array_ = ptr;
+			array_size_ = ar_size;
 		}
 		catch (std::exception &err)
 		{
@@ -154,9 +157,6 @@ void stack<T>::push(T const & value)
 		{
 			std::cerr << "error";
 		}
-		delete[] array_;
-		array_ = ptr;
-		array_size_ = ar_size;
 	}
 	array_[count_] = value;
 	count_++;
