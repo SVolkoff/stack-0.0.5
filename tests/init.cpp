@@ -32,6 +32,7 @@ SCENARIO("stack op=")
 }
 
 SCENARIO("stack push pop")
+{
 	stack<int> st;
 	st.push(4);
 	st.push(5);
