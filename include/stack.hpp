@@ -3,10 +3,13 @@
 #include <mutex>
 #include <memory>
 #include <stdexcept>
+#include <utility>
+#include <new>
+#include <thread>
+#include <condition_variable>
 
 #ifndef STACK_HPP
 #define STACK_HPP
-
 
 template <typename T> class stack
 {
@@ -17,7 +20,8 @@ public:
 	stack<T> & operator=(stack<T> const & other); /*strong*/
 	size_t count() const noexcept;
 	void push(T const &); /*strong*/
-	auto pop()->std::shared_ptr<T>; /*strong*/
+	auto try_pop()->std::shared_ptr<T>;
+	auto wait_and_pop()->std::shared_ptr<T>;
 	void print() const; /*strong*/
 	bool isempty() const noexcept;
 
@@ -116,17 +120,28 @@ size_t stack<T>::count() const noexcept
 	return count_;
 }
 
+
 template <typename T>
-auto stack<T>::pop() -> std::shared_ptr<T>
+auto stack<T>::try_pop() -> std::shared_ptr<T>
 {
 	std::lock_guard<std::mutex> lock(mutex_);
-	if (count_ == 0)
-	{
-		throw ("Stack is empty!");
-	}
-	auto top = std::make_shared<T>(array_[count_ - 1]);
+
+	if (!count_)
+		return nullptr;
 	count_--;
-	return top;
+	return std::make_shared<T>(array_[count_]);
+}
+
+
+template <typename T>
+auto stack<T>::wait_and_pop() -> std::shared_ptr<T>
+{
+	std::unique_lock<std::mutex> lock(mutex_);
+
+	while (!count_)
+		cond_.wait(lock);
+	count_--;
+	return std::make_shared<T>(array_[count_]);
 }
 
 template<typename T>
