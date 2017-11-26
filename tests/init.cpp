@@ -38,8 +38,8 @@ SCENARIO("stack push pop")
 	st.push(5);
 	st.push(6);
 	st.push(7);
-	auto p =st.try_pop();
+	auto p =st.pop();
 	REQUIRE(st.count() == 3);
-	REQUIRE(*p==7);
+	REQUIRE(p==7);
 } 
 
